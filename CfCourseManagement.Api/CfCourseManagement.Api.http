@@ -1,0 +1,6 @@
+@CfCourseManagement.Api_HostAddress = http://localhost:5037
+
+GET {{CfCourseManagement.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
