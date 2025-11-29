@@ -11,5 +11,7 @@ namespace CfCourseManagement.Api.Data
         }
 
         public DbSet<Course> Courses { get; set; }
+        public DbSet<Teacher> Teachers { get; set; }
+
     }
 }

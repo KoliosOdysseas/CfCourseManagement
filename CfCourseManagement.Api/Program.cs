@@ -23,6 +23,7 @@ namespace CfCourseManagement.Api
                     builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddScoped<ICourseService, CourseService>();
+            builder.Services.AddScoped<ITeacherService, TeacherService>();
 
 
             var app = builder.Build();

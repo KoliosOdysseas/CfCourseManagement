@@ -8,5 +8,11 @@
         public int Credits { get; set; }  // Π.χ. ώρες / μονάδες μαθήματος
         public DateTime StartDate  { get; set; }  // Ημερομηνία έναρξης
         public DateTime EndDate { get; set; } // Ημερομηνία λήξης
+
+        // Foreign key προς Teacher (προαιρετικό για να μην σπάσουν τα παλιά δεδομένα)
+        public int? TeacherId { get; set; }
+
+        // Navigation property: αυτό το Course ανήκει σε έναν Teacher
+        public Teacher? Teacher { get; set; }
     }
 }
