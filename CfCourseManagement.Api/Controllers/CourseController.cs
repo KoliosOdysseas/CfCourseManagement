@@ -1,28 +1,43 @@
-﻿using CfCourseManagement.Api.Data;
-using CfCourseManagement.Api.Models;
-using Microsoft.AspNetCore.Http;
+﻿using CfCourseManagement.Api.Models;
+using CfCourseManagement.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CfCourseManagement.Api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class CourseController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICourseService _courseService;
 
-        public CourseController(ApplicationDbContext context)
+        // Ο controller ΔΕΝ παίρνει πια ApplicationDbContext, αλλά ICourseService
+        public CourseController(ICourseService courseService)
         {
-            _context = context; // Dependency Injection του ApplicationDbContext
+            _courseService = courseService; // Κρατάμε το service για να το χρησιμοποιούμε στα endpoints
         }
 
-        // GET: api/Course
+        // GET: api/course
         [HttpGet]
         public IActionResult GetAll()
-            {
-            var courses = _context.Courses.ToList();
+        {
+            var courses = _courseService.GetAll();
             return Ok(courses);
         }
+
+        // GET: api/course/{id}
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)
+        {
+            var course = _courseService.GetById(id);
+
+            if (course == null)
+            {
+                return NotFound($"Course with ID {id} not found");
+            }
+
+            return Ok(course);
+        }
+
         // POST: api/course
         [HttpPost]
         public IActionResult Create([FromBody] Course course)
@@ -32,79 +47,48 @@ namespace CfCourseManagement.Api.Controllers
                 return BadRequest("Course cannot be null");
             }
 
-            _context.Courses.Add(course);   // Προσθέτουμε το course στη βάση
-            _context.SaveChanges();         // Αποθηκεύουμε τις αλλαγές
+            var created = _courseService.Create(course);
 
-            return CreatedAtAction(nameof(GetAll), new { id = course.Id }, course);
+            // Τώρα χρησιμοποιούμε το GetById για το CreatedAtAction
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
-        // GET: api/course/{id}
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)
-        {
-            var course = _context.Courses.Find(id);
 
-            if (course == null)
-            {
-                return NotFound($"Course with ID {id} not found");
-            }
-
-            return Ok(course);
-        }
         // PUT: api/course/{id}
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Course updatedCourse)
+        public IActionResult Update(int id, [FromBody] Course course)
         {
-            if (updatedCourse == null)
+            if (course == null)
             {
-                return BadRequest("Invalid course data");
+                return BadRequest("Course data is required");
             }
-            
-            if (id != updatedCourse.Id)
+
+            if (id != course.Id)
             {
                 return BadRequest("Route id and course id do not match");
-
             }
-            // Εύρεση του υπάρχοντος μαθήματος
-            var existingCourse = _context.Courses.Find(id);
-            if (existingCourse == null)
+
+            var success = _courseService.Update(id, course);
+
+            if (!success)
             {
                 return NotFound($"Course with ID {id} not found");
             }
-            // Ενημέρωση των πεδίων
-            existingCourse.Title = updatedCourse.Title;
-            existingCourse.Description = updatedCourse.Description;
-            existingCourse.Credits = updatedCourse.Credits;
-            existingCourse.StartDate = updatedCourse.StartDate;
-            existingCourse.EndDate = updatedCourse.EndDate;
 
-            _context.SaveChanges(); // Αποθήκευση των αλλαγών στη βάση
-
-            return NoContent(); // Επιστρέφουμε 204 No Content
-
+            return NoContent();
         }
+
         // DELETE: api/course/{id}
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            // Εύρεση του μαθήματος προς διαγραφή
-            var course = _context.Courses.Find(id);
+            var success = _courseService.Delete(id);
 
-            // Έλεγχος αν το μάθημα υπάρχει
-            if (course == null)
+            if (!success)
             {
                 return NotFound($"Course with ID {id} not found");
             }
 
-            // Διαγραφή του μαθήματος
-            _context.Courses.Remove(course);
-
-            // Αποθήκευση των αλλαγών στη βάση δεδομένων
-            _context.SaveChanges();
-
-            return NoContent(); // Επιστρέφουμε 204 No Content
+            return NoContent();
         }
-
-
-
     }
 }

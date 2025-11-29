@@ -1,4 +1,5 @@
 ﻿using CfCourseManagement.Api.Data;
+using CfCourseManagement.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace CfCourseManagement.Api
@@ -13,14 +14,18 @@ namespace CfCourseManagement.Api
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            
+
 
             // Εδώ προσθέτουμε τον ApplicationDbContext και τον συνδέουμε με SQL Server
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            builder.Services.AddScoped<ICourseService, CourseService>();
 
-             var app = builder.Build();
+
+            var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
