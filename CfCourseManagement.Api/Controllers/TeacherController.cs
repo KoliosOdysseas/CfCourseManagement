@@ -1,4 +1,4 @@
-﻿using CfCourseManagement.Api.Models;
+﻿using CfCourseManagement.Api.Dtos.Teachers;
 using CfCourseManagement.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,17 +17,17 @@ namespace CfCourseManagement.Api.Controllers
 
         // GET: api/teacher
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var teachers = _teacherService.GetAll();
+            var teachers = await _teacherService.GetAllAsync();
             return Ok(teachers);
         }
 
         // GET: api/teacher/{id}
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var teacher = _teacherService.GetById(id);
+            var teacher = await _teacherService.GetByIdAsync(id);
             if (teacher == null)
             {
                 return NotFound($"Teacher with ID {id} not found");
@@ -38,32 +38,30 @@ namespace CfCourseManagement.Api.Controllers
 
         // POST: api/teacher
         [HttpPost]
-        public IActionResult Create([FromBody] Teacher teacher)
+        public async Task<IActionResult> Create([FromBody] TeacherCreateDto dto)
         {
-            if (teacher == null)
-            {
-                return BadRequest("Teacher cannot be null");
-            }
-
-            var created = _teacherService.Create(teacher);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
-        }
-
-        // PUT: api/teacher/{id}
-        [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Teacher teacher)
-        {
-            if (teacher == null)
+            if (dto == null)
             {
                 return BadRequest("Teacher data is required");
             }
 
-            if (id != teacher.Id)
+            var created = await _teacherService.CreateAsync(dto);
+
+            return CreatedAtAction(nameof(GetById),
+                new { id = created.Id },
+                created);
+        }
+
+        // PUT: api/teacher/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] TeacherUpdateDto dto)
+        {
+            if (dto == null)
             {
-                return BadRequest("Route id and teacher id do not match");
+                return BadRequest("Teacher data is required");
             }
 
-            var success = _teacherService.Update(id, teacher);
+            var success = await _teacherService.UpdateAsync(id, dto);
             if (!success)
             {
                 return NotFound($"Teacher with ID {id} not found");
@@ -74,9 +72,9 @@ namespace CfCourseManagement.Api.Controllers
 
         // DELETE: api/teacher/{id}
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var success = _teacherService.Delete(id);
+            var success = await _teacherService.DeleteAsync(id);
             if (!success)
             {
                 return NotFound($"Teacher with ID {id} not found");

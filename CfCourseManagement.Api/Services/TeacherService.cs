@@ -1,5 +1,7 @@
 ﻿using CfCourseManagement.Api.Data;
+using CfCourseManagement.Api.Dtos.Teachers;
 using CfCourseManagement.Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CfCourseManagement.Api.Services
 {
@@ -12,43 +14,74 @@ namespace CfCourseManagement.Api.Services
             _context = context;
         }
 
-        public List<Teacher> GetAll()
+        public async Task<List<TeacherDto>> GetAllAsync()
         {
-            return _context.Teachers.ToList();
+            var teachers = await _context.Teachers.AsNoTracking().ToListAsync();
+
+            return teachers.Select(t => new TeacherDto
+            {
+                Id = t.Id,
+                FullName = t.FullName,
+                Email = t.Email,
+                Phone = t.Phone
+            }).ToList();
         }
 
-        public Teacher? GetById(int id)
+        public async Task<TeacherDto?> GetByIdAsync(int id)
         {
-            return _context.Teachers.Find(id);
+            var teacher = await _context.Teachers.FindAsync(id);
+            if (teacher == null) return null;
+
+            return new TeacherDto
+            {
+                Id = teacher.Id,
+                FullName = teacher.FullName,
+                Email = teacher.Email,
+                Phone = teacher.Phone
+            };
         }
 
-        public Teacher Create(Teacher teacher)
+        public async Task<TeacherDto> CreateAsync(TeacherCreateDto dto)
         {
+            var teacher = new Teacher
+            {
+                FullName = dto.FullName,
+                Email = dto.Email,
+                Phone = dto.Phone
+            };
+
             _context.Teachers.Add(teacher);
-            _context.SaveChanges();
-            return teacher;
+            await _context.SaveChangesAsync();
+
+            return new TeacherDto
+            {
+                Id = teacher.Id,
+                FullName = teacher.FullName,
+                Email = teacher.Email,
+                Phone = teacher.Phone
+            };
         }
 
-        public bool Update(int id, Teacher teacher)
+        public async Task<bool> UpdateAsync(int id, TeacherUpdateDto dto)
         {
-            var existing = _context.Teachers.Find(id);
-            if (existing == null) return false;
+            var teacher = await _context.Teachers.FindAsync(id);
+            if (teacher == null) return false;
 
-            existing.FullName = teacher.FullName;
-            existing.Email = teacher.Email;
-            existing.Phone = teacher.Phone;
+            teacher.FullName = dto.FullName;
+            teacher.Email = dto.Email;
+            teacher.Phone = dto.Phone;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return true;
         }
 
-        public bool Delete(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            var existing = _context.Teachers.Find(id);
-            if (existing == null) return false;
+            var teacher = await _context.Teachers.FindAsync(id);
+            if (teacher == null) return false;
 
-            _context.Teachers.Remove(existing);
-            _context.SaveChanges();
+            _context.Teachers.Remove(teacher);
+            await _context.SaveChangesAsync();
             return true;
         }
     }

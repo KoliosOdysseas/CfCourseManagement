@@ -1,57 +1,133 @@
 ﻿using CfCourseManagement.Api.Data;
+using CfCourseManagement.Api.Dtos.Courses;
 using CfCourseManagement.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CfCourseManagement.Api.Services
 {
-    public class CourseService: ICourseService
+    public class CourseService : ICourseService
     {
         private readonly ApplicationDbContext _context;
 
         public CourseService(ApplicationDbContext context)
-        { 
-         _context = context;
-        }
-        public List<Course> GetAll()
         {
-            return _context.Courses.ToList();
+            _context = context;
         }
 
-        public Course? GetById(int id)
+        public async Task<List<CourseDto>> GetAllAsync()
         {
-            return _context.Courses.Find(id);
-        }
-        public Course Create(Course course)
-        {
-            _context.Courses.Add(course);
-            _context.SaveChanges();
-            return course;
-        }
-        public bool Update(int id, Course course)
-        {
-            var existingCourse = _context.Courses.Find(id);
-            if (existingCourse == null)
+            var courses = await _context.Courses
+                .AsNoTracking()
+                .ToListAsync();
+
+            return courses.Select(c => new CourseDto
             {
-                return false;
-            }
-            existingCourse.Title = course.Title;
-            existingCourse.Description = course.Description;
-            existingCourse.Credits = course.Credits;
-            existingCourse.StartDate = course.StartDate;
-            existingCourse.EndDate = course.EndDate;
+                Id = c.Id,
+                Title = c.Title,
+                Description = c.Description,
+                Credits = c.Credits,
+                StartDate = c.StartDate,
+                EndDate = c.EndDate,
+                TeacherId = c.TeacherId
+            }).ToList();
+        }
+        // Get a course by ID
+        public async Task<CourseDto?> GetByIdAsync(int id)
+        {
+            var course = await _context.Courses
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Id == id);
 
-            _context.SaveChanges();
+            if (course == null) return null;
+
+            return new CourseDto
+            {
+                Id = course.Id,
+                Title = course.Title,
+                Description = course.Description,
+                Credits = course.Credits,
+                StartDate = course.StartDate,
+                EndDate = course.EndDate,
+                TeacherId = course.TeacherId
+            };
+        }
+        // Create a new course
+        public async Task<CourseDto> CreateAsync(CourseCreateDto dto)
+        {
+            // check if TeacherId exists
+            if (dto.TeacherId.HasValue)
+            {
+                var teacherExists = await _context.Teachers
+                    .AnyAsync(t => t.Id == dto.TeacherId.Value);
+
+                if (!teacherExists)
+                {
+                    throw new ArgumentException(
+                        $"Teacher with ID {dto.TeacherId.Value} does not exist.");
+                }
+            }
+
+            var course = new Course
+            {
+                Title = dto.Title,
+                Description = dto.Description,
+                Credits = dto.Credits,
+                StartDate = dto.StartDate,
+                EndDate = dto.EndDate,
+                TeacherId = dto.TeacherId
+            };
+
+            _context.Courses.Add(course);
+            await _context.SaveChangesAsync();
+
+            return new CourseDto
+            {
+                Id = course.Id,
+                Title = course.Title,
+                Description = course.Description,
+                Credits = course.Credits,
+                StartDate = course.StartDate,
+                EndDate = course.EndDate,
+                TeacherId = course.TeacherId
+            };
+        }
+        // Update an existing course
+        public async Task<bool> UpdateAsync(int id, CourseUpdateDto dto)
+        {
+            var course = await _context.Courses.FirstOrDefaultAsync(c => c.Id == id);
+            if (course == null) return false;
+
+            // check if TeacherId exists
+            if (dto.TeacherId.HasValue)
+            {
+                var teacherExists = await _context.Teachers
+                    .AnyAsync(t => t.Id == dto.TeacherId.Value);
+
+                if (!teacherExists)
+                {
+                    throw new ArgumentException(
+                        $"Teacher with ID {dto.TeacherId.Value} does not exist.");
+                }
+            }
+
+            course.Title = dto.Title;
+            course.Description = dto.Description;
+            course.Credits = dto.Credits;
+            course.StartDate = dto.StartDate;
+            course.EndDate = dto.EndDate;
+            course.TeacherId = dto.TeacherId;
+
+            await _context.SaveChangesAsync();
             return true;
         }
-        public bool Delete(int id)
+        // Delete a course
+        public async Task<bool> DeleteAsync(int id)
         {
-            var course = _context.Courses.Find(id);
-            if (course == null)
-            {
-                return false;
-            }
+            var course = await _context.Courses.FirstOrDefaultAsync(c => c.Id == id);
+            if (course == null) return false;
+
             _context.Courses.Remove(course);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return true;
         }
     }

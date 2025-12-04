@@ -1,4 +1,4 @@
-﻿using CfCourseManagement.Api.Models;
+﻿using CfCourseManagement.Api.Dtos.Courses;
 using CfCourseManagement.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,26 +10,24 @@ namespace CfCourseManagement.Api.Controllers
     {
         private readonly ICourseService _courseService;
 
-        // Ο controller ΔΕΝ παίρνει πια ApplicationDbContext, αλλά ICourseService
         public CourseController(ICourseService courseService)
         {
-            _courseService = courseService; // Κρατάμε το service για να το χρησιμοποιούμε στα endpoints
+            _courseService = courseService;
         }
 
         // GET: api/course
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var courses = _courseService.GetAll();
+            var courses = await _courseService.GetAllAsync();
             return Ok(courses);
         }
 
         // GET: api/course/{id}
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var course = _courseService.GetById(id);
-
+            var course = await _courseService.GetByIdAsync(id);
             if (course == null)
             {
                 return NotFound($"Course with ID {id} not found");
@@ -40,49 +38,59 @@ namespace CfCourseManagement.Api.Controllers
 
         // POST: api/course
         [HttpPost]
-        public IActionResult Create([FromBody] Course course)
+        public async Task<IActionResult> Create([FromBody] CourseCreateDto dto)
         {
-            if (course == null)
-            {
-                return BadRequest("Course cannot be null");
-            }
-
-            var created = _courseService.Create(course);
-
-            // Τώρα χρησιμοποιούμε το GetById για το CreatedAtAction
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
-        }
-
-        // PUT: api/course/{id}
-        [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Course course)
-        {
-            if (course == null)
+            if (dto == null)
             {
                 return BadRequest("Course data is required");
             }
 
-            if (id != course.Id)
+            try
             {
-                return BadRequest("Route id and course id do not match");
+                var created = await _courseService.CreateAsync(dto);
+
+                return CreatedAtAction(nameof(GetById),
+                    new { id = created.Id },
+                    created);
+            }
+            catch (ArgumentException ex)
+            {
+                // Π.χ. λάθος TeacherId
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // PUT: api/course/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] CourseUpdateDto dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest("Course data is required");
             }
 
-            var success = _courseService.Update(id, course);
-
-            if (!success)
+            try
             {
-                return NotFound($"Course with ID {id} not found");
-            }
+                var success = await _courseService.UpdateAsync(id, dto);
+                if (!success)
+                {
+                    return NotFound($"Course with ID {id} not found");
+                }
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (ArgumentException ex)
+            {
+                // Π.χ. λάθος TeacherId
+                return BadRequest(ex.Message);
+            }
         }
 
         // DELETE: api/course/{id}
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var success = _courseService.Delete(id);
-
+            var success = await _courseService.DeleteAsync(id);
             if (!success)
             {
                 return NotFound($"Course with ID {id} not found");

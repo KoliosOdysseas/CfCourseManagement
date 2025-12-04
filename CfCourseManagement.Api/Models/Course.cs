@@ -14,5 +14,14 @@
 
         // Navigation property: αυτό το Course ανήκει σε έναν Teacher
         public Teacher? Teacher { get; set; }
+
+        // Many-to-Many: Ένα Course μπορεί να έχει πολλούς Students
+        public List<Student> Students { get; set; } = new();
+
+        // Navigation property για τις εγγραφές
+        public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+
+
+
     }
 }

@@ -1,13 +1,13 @@
-﻿using CfCourseManagement.Api.Models;
+﻿using CfCourseManagement.Api.Dtos.Courses;
 
 namespace CfCourseManagement.Api.Services
 {
     public interface ICourseService
     {
-        List<Course> GetAll();
-        Course? GetById(int id);
-        Course Create(Course course);
-        bool Update(int id, Course course);
-        bool Delete(int id);
+        Task<List<CourseDto>> GetAllAsync();
+        Task<CourseDto?> GetByIdAsync(int id);
+        Task<CourseDto> CreateAsync(CourseCreateDto dto);
+        Task<bool> UpdateAsync(int id, CourseUpdateDto dto);
+        Task<bool> DeleteAsync(int id);
     }
 }

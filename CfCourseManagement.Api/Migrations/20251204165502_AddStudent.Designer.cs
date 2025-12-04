@@ -4,6 +4,7 @@ using CfCourseManagement.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CfCourseManagement.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251204165502_AddStudent")]
+    partial class AddStudent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,27 +57,6 @@ namespace CfCourseManagement.Api.Migrations
                     b.HasIndex("TeacherId");
 
                     b.ToTable("Courses");
-                });
-
-            modelBuilder.Entity("CfCourseManagement.Api.Models.Enrollment", b =>
-                {
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("EnrolledAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("Grade")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("StudentId", "CourseId");
-
-                    b.HasIndex("CourseId");
-
-                    b.ToTable("Enrollments");
                 });
 
             modelBuilder.Entity("CfCourseManagement.Api.Models.Student", b =>
@@ -138,25 +120,6 @@ namespace CfCourseManagement.Api.Migrations
                     b.Navigation("Teacher");
                 });
 
-            modelBuilder.Entity("CfCourseManagement.Api.Models.Enrollment", b =>
-                {
-                    b.HasOne("CfCourseManagement.Api.Models.Course", "Course")
-                        .WithMany("Enrollments")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CfCourseManagement.Api.Models.Student", "Student")
-                        .WithMany("Enrollments")
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("Student");
-                });
-
             modelBuilder.Entity("CfCourseManagement.Api.Models.Student", b =>
                 {
                     b.HasOne("CfCourseManagement.Api.Models.Course", null)
@@ -166,14 +129,7 @@ namespace CfCourseManagement.Api.Migrations
 
             modelBuilder.Entity("CfCourseManagement.Api.Models.Course", b =>
                 {
-                    b.Navigation("Enrollments");
-
                     b.Navigation("Students");
-                });
-
-            modelBuilder.Entity("CfCourseManagement.Api.Models.Student", b =>
-                {
-                    b.Navigation("Enrollments");
                 });
 
             modelBuilder.Entity("CfCourseManagement.Api.Models.Teacher", b =>

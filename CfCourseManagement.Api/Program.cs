@@ -24,6 +24,10 @@ namespace CfCourseManagement.Api
 
             builder.Services.AddScoped<ICourseService, CourseService>();
             builder.Services.AddScoped<ITeacherService, TeacherService>();
+            builder.Services.AddScoped<IStudentService, StudentService>();
+            builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+
+
 
 
             var app = builder.Build();
