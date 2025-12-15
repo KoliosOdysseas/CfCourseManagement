@@ -1,5 +1,6 @@
 ﻿using CfCourseManagement.Api.Dtos.Students;
 using CfCourseManagement.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CfCourseManagement.Api.Controllers
@@ -16,6 +17,8 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // GET: api/student
+        // Admin ή Teacher μπορούν να δουν τους students
+        [Authorize(Roles = "Admin,Teacher")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -24,6 +27,8 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // GET: api/student/{id}
+        // Admin ή Teacher μπορούν να δουν student
+        [Authorize(Roles = "Admin,Teacher")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -37,6 +42,8 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // POST: api/student
+        // ΜΟΝΟ Admin μπορεί να δημιουργεί students
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] StudentCreateDto dto)
         {
@@ -53,6 +60,8 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // PUT: api/student/{id}
+        // ΜΟΝΟ Admin μπορεί να κάνει update students
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] StudentUpdateDto dto)
         {
@@ -71,16 +80,24 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // DELETE: api/student/{id}
+        // ΜΟΝΟ Admin μπορεί να διαγράφει students
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var success = await _studentService.DeleteAsync(id);
-            if (!success)
+            try
             {
-                return NotFound($"Student with ID {id} not found");
-            }
+                var success = await _studentService.DeleteAsync(id);
+                if (!success)
+                    return NotFound($"Student with ID {id} not found");
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
+
     }
 }

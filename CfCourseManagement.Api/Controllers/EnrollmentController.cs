@@ -1,5 +1,6 @@
 ﻿using CfCourseManagement.Api.Dtos.Enrollments;
 using CfCourseManagement.Api.Services;
+using Microsoft.AspNetCore.Authorization; 
 using Microsoft.AspNetCore.Mvc;
 
 namespace CfCourseManagement.Api.Controllers
@@ -16,7 +17,8 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // POST: api/enrollment
-        // Body: { "studentId": 1, "courseId": 2 }
+        // Admin ή Student μπορεί να εγγραφεί σε μάθημα
+        [Authorize(Roles = "Admin,Student")]
         [HttpPost]
         public async Task<IActionResult> Enroll([FromBody] EnrollmentCreateDto dto)
         {
@@ -32,19 +34,21 @@ namespace CfCourseManagement.Api.Controllers
             }
             catch (ArgumentException ex)
             {
-                // λάθος studentId ή courseId
                 return BadRequest(ex.Message);
             }
             catch (InvalidOperationException ex)
             {
-                // ήδη γραμμένος
                 return Conflict(ex.Message);
             }
         }
 
         // DELETE: api/enrollment?studentId=1&courseId=2
+        // Admin ή Student μπορεί να κάνει unenroll
+        [Authorize(Roles = "Admin,Student")]
         [HttpDelete]
-        public async Task<IActionResult> Unenroll([FromQuery] int studentId, [FromQuery] int courseId)
+        public async Task<IActionResult> Unenroll(
+            [FromQuery] int studentId,
+            [FromQuery] int courseId)
         {
             var success = await _enrollmentService.UnenrollAsync(studentId, courseId);
             if (!success)
@@ -56,6 +60,8 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // GET: api/enrollment/course/2/students
+        // Admin ή Teacher βλέπουν students ενός course
+        [Authorize(Roles = "Admin,Teacher")]
         [HttpGet("course/{courseId}/students")]
         public async Task<IActionResult> GetStudentsByCourse(int courseId)
         {
@@ -71,6 +77,8 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // GET: api/enrollment/student/5/courses
+        // Admin, Teacher ή Student βλέπουν courses ενός student
+        [Authorize(Roles = "Admin,Teacher,Student")]
         [HttpGet("student/{studentId}/courses")]
         public async Task<IActionResult> GetCoursesByStudent(int studentId)
         {

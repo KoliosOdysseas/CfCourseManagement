@@ -1,5 +1,6 @@
-﻿using CfCourseManagement.Api.Dtos.Courses;
-using CfCourseManagement.Api.Services;
+﻿using CfCourseManagement.Api.Dtos.Courses; 
+using CfCourseManagement.Api.Services; 
+using Microsoft.AspNetCore.Authorization; 
 using Microsoft.AspNetCore.Mvc;
 
 namespace CfCourseManagement.Api.Controllers
@@ -16,6 +17,7 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // GET: api/course
+        // Public endpoint 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -24,6 +26,7 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // GET: api/course/{id}
+        // Public endpoint
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -37,6 +40,8 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // POST: api/course
+        // ΜΟΝΟ Admin ή Teacher
+        [Authorize(Roles = "Admin,Teacher")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CourseCreateDto dto)
         {
@@ -55,12 +60,13 @@ namespace CfCourseManagement.Api.Controllers
             }
             catch (ArgumentException ex)
             {
-                // Π.χ. λάθος TeacherId
                 return BadRequest(ex.Message);
             }
         }
 
         // PUT: api/course/{id}
+        // ΜΟΝΟ Admin ή Teacher
+        [Authorize(Roles = "Admin,Teacher")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] CourseUpdateDto dto)
         {
@@ -81,22 +87,29 @@ namespace CfCourseManagement.Api.Controllers
             }
             catch (ArgumentException ex)
             {
-                // Π.χ. λάθος TeacherId
                 return BadRequest(ex.Message);
             }
         }
 
         // DELETE: api/course/{id}
+        // ΜΟΝΟ Admin ή Teacher
+        [Authorize(Roles = "Admin,Teacher")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var success = await _courseService.DeleteAsync(id);
-            if (!success)
+            try
             {
-                return NotFound($"Course with ID {id} not found");
-            }
+                var success = await _courseService.DeleteAsync(id);
+                if (!success)
+                    return NotFound($"Course with ID {id} not found");
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);
+            }
         }
+
     }
 }

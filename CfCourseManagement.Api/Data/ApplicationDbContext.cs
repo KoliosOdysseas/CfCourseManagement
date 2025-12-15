@@ -53,6 +53,15 @@ namespace CfCourseManagement.Api.Data
                 .HasOne(u => u.Role)
                 .WithMany(r => r.Users)
                 .HasForeignKey(u => u.RoleId);
+
+            // Seed Roles
+            modelBuilder.Entity<Role>().HasData(
+              new Role { Id = 1, Name = "Admin" },
+              new Role { Id = 2, Name = "Teacher" },
+              new Role { Id = 3, Name = "Student" }
+             );
+
         }
+
     }
 }

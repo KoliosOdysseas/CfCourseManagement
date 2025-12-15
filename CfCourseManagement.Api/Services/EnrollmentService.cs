@@ -18,34 +18,28 @@ namespace CfCourseManagement.Api.Services
 
         public async Task<EnrollmentDto> EnrollAsync(EnrollmentCreateDto dto)
         {
-            // 1.checks before enrolling a student in a course
+            // 1) check student exists
             var studentExists = await _context.Students
                 .AnyAsync(s => s.Id == dto.StudentId);
 
             if (!studentExists)
-            {
                 throw new ArgumentException($"Student with ID {dto.StudentId} does not exist.");
-            }
 
-            // 2.check if course exists
+            // 2) check course exists
             var courseExists = await _context.Courses
                 .AnyAsync(c => c.Id == dto.CourseId);
 
             if (!courseExists)
-            {
                 throw new ArgumentException($"Course with ID {dto.CourseId} does not exist.");
-            }
 
-            // 3.check if the student is already enrolled in the course
+            // 3) check already enrolled (business check)
             var alreadyEnrolled = await _context.Enrollments
                 .AnyAsync(e => e.StudentId == dto.StudentId && e.CourseId == dto.CourseId);
 
             if (alreadyEnrolled)
-            {
                 throw new InvalidOperationException("Student is already enrolled in this course.");
-            }
 
-            // 4. check if the course has reached its maximum capacity (optional)
+            // 4) create enrollment
             var enrollment = new Enrollment
             {
                 StudentId = dto.StudentId,
@@ -54,7 +48,17 @@ namespace CfCourseManagement.Api.Services
             };
 
             _context.Enrollments.Add(enrollment);
-            await _context.SaveChangesAsync();
+
+            // SAVE με try/catch (Composite PK / race condition)
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                // αν δύο enroll requests έρθουν ταυτόχρονα → composite PK (StudentId,CourseId) σκάει
+                throw new InvalidOperationException("Student is already enrolled in this course.");
+            }
 
             return new EnrollmentDto
             {
@@ -70,24 +74,30 @@ namespace CfCourseManagement.Api.Services
             var enrollment = await _context.Enrollments
                 .FirstOrDefaultAsync(e => e.StudentId == studentId && e.CourseId == courseId);
 
-            if (enrollment == null) return false;
+            if (enrollment == null)
+                return false;
 
             _context.Enrollments.Remove(enrollment);
-            await _context.SaveChangesAsync();
 
-            return true;
+            // (προαιρετικό αλλά επαγγελματικό) για να μην δεις ποτέ 500 από DB θέμα
+            try
+            {
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException)
+            {
+                throw new InvalidOperationException("Unenroll failed due to database constraints.");
+            }
         }
 
         public async Task<List<StudentDto>> GetStudentsByCourseAsync(int courseId)
         {
-            // optional: check if course exists
             var courseExists = await _context.Courses
                 .AnyAsync(c => c.Id == courseId);
 
             if (!courseExists)
-            {
                 throw new ArgumentException($"Course with ID {courseId} does not exist.");
-            }
 
             var students = await _context.Enrollments
                 .Where(e => e.CourseId == courseId)
@@ -110,9 +120,7 @@ namespace CfCourseManagement.Api.Services
                 .AnyAsync(s => s.Id == studentId);
 
             if (!studentExists)
-            {
                 throw new ArgumentException($"Student with ID {studentId} does not exist.");
-            }
 
             var courses = await _context.Enrollments
                 .Where(e => e.StudentId == studentId)

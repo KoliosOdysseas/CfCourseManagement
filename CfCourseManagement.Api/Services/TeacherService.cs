@@ -78,11 +78,24 @@ namespace CfCourseManagement.Api.Services
         public async Task<bool> DeleteAsync(int id)
         {
             var teacher = await _context.Teachers.FindAsync(id);
-            if (teacher == null) return false;
+            if (teacher == null)
+                return false;
 
             _context.Teachers.Remove(teacher);
-            await _context.SaveChangesAsync();
-            return true;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException)
+            {
+                // Υπάρχουν Courses που έχουν TeacherId
+                throw new InvalidOperationException(
+                    "Cannot delete teacher because there are courses assigned to them."
+                );
+            }
         }
+
     }
 }

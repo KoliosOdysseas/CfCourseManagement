@@ -123,12 +123,25 @@ namespace CfCourseManagement.Api.Services
         // Delete a course
         public async Task<bool> DeleteAsync(int id)
         {
-            var course = await _context.Courses.FirstOrDefaultAsync(c => c.Id == id);
-            if (course == null) return false;
+            var course = await _context.Courses.FindAsync(id);
+            if (course == null)
+                return false;
 
             _context.Courses.Remove(course);
-            await _context.SaveChangesAsync();
-            return true;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException)
+            {
+                // Υπάρχουν Enrollments για το course
+                throw new InvalidOperationException(
+                    "Cannot delete course because there are students enrolled in it."
+                );
+            }
         }
+
     }
 }
