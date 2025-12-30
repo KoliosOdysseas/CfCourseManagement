@@ -108,10 +108,11 @@ namespace CfCourseManagement.Api.Services
             return students.Select(s => new StudentDto
             {
                 Id = s.Id,
-                FirstName = s.FirstName,
-                LastName = s.LastName,
+                FullName = s.FullName,
+                Phone = s.Phone,
                 Email = s.Email
             }).ToList();
+
         }
 
         public async Task<List<CourseDto>> GetCoursesByStudentAsync(int studentId)

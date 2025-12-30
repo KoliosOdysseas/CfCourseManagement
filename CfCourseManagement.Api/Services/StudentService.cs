@@ -23,8 +23,8 @@ namespace CfCourseManagement.Api.Services
             return students.Select(s => new StudentDto
             {
                 Id = s.Id,
-                FirstName = s.FirstName,
-                LastName = s.LastName,
+                FullName = s.FullName,
+                Phone = s.Phone,
                 Email = s.Email
             }).ToList();
         }
@@ -40,8 +40,8 @@ namespace CfCourseManagement.Api.Services
             return new StudentDto
             {
                 Id = student.Id,
-                FirstName = student.FirstName,
-                LastName = student.LastName,
+                FullName = student.FullName,
+                Phone = student.Phone,
                 Email = student.Email
             };
         }
@@ -50,8 +50,8 @@ namespace CfCourseManagement.Api.Services
         {
             var student = new Student
             {
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
+                FullName = dto.FullName,
+                Phone = dto.Phone,
                 Email = dto.Email
             };
 
@@ -61,8 +61,8 @@ namespace CfCourseManagement.Api.Services
             return new StudentDto
             {
                 Id = student.Id,
-                FirstName = student.FirstName,
-                LastName = student.LastName,
+                FullName = student.FullName,
+                Phone = student.Phone,
                 Email = student.Email
             };
         }
@@ -72,8 +72,8 @@ namespace CfCourseManagement.Api.Services
             var student = await _context.Students.FirstOrDefaultAsync(s => s.Id == id);
             if (student == null) return false;
 
-            student.FirstName = dto.FirstName;
-            student.LastName = dto.LastName;
+            student.FullName = dto.FullName;
+            student.Phone = dto.Phone;
             student.Email = dto.Email;
 
             await _context.SaveChangesAsync();
@@ -83,8 +83,7 @@ namespace CfCourseManagement.Api.Services
         public async Task<bool> DeleteAsync(int id)
         {
             var student = await _context.Students.FindAsync(id);
-            if (student == null)
-                return false;
+            if (student == null) return false;
 
             _context.Students.Remove(student);
 
@@ -101,6 +100,5 @@ namespace CfCourseManagement.Api.Services
                 );
             }
         }
-
     }
 }

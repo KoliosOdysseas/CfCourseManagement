@@ -19,6 +19,19 @@ namespace CfCourseManagement.Api
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
 
+            // CORS (Allow Angular frontend)
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAngular",
+                    policy =>
+                    {
+                        policy
+                            .WithOrigins("http://localhost:4200")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
+            });
+
             // Swagger + JWT "Authorize"
             builder.Services.AddSwaggerGen(c =>
             {
@@ -59,7 +72,6 @@ namespace CfCourseManagement.Api
             builder.Services.AddScoped<IStudentService, StudentService>();
             builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
             builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-
 
             // JWT Authentication
             var jwtKey = builder.Configuration["Jwt:Key"];
@@ -105,6 +117,9 @@ namespace CfCourseManagement.Api
             }
 
             app.UseHttpsRedirection();
+
+            // Enable CORS BEFORE Authentication/Authorization
+            app.UseCors("AllowAngular");
 
             // IMPORTANT: Authentication πριν το Authorization
             app.UseAuthentication();

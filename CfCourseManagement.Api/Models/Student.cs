@@ -7,12 +7,15 @@ namespace CfCourseManagement.Api.Models
         public int Id { get; set; }
 
         [Required]
-        public string FirstName { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
 
-        [Required]
-        public string LastName { get; set; } = string.Empty;
+
+        public string? Phone { get; set; }
+
+
 
         [EmailAddress]
+        [Required]
         public string? Email { get; set; }
 
         // Navigation property για τις εγγραφές
