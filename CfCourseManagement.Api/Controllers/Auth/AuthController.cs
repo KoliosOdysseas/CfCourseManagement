@@ -59,6 +59,42 @@ namespace CfCourseManagement.Api.Controllers
             };
 
             // SAVE με try/catch (UNIQUE constraint / race condition)
+            if (dto.RoleName == "Student")
+            {
+                var student = new Student
+                {
+                    FullName = dto.UserName,
+                    Email = dto.Email
+                };
+                try
+                {
+                    _context.Students.Add(student);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException)
+                {
+                    // αν δύο register έρθουν ταυτόχρονα με ίδιο username → UNIQUE index σκάει
+                    return Conflict("UserName already exists.");
+                }
+            }
+            else if (dto.RoleName == "Teacher")
+            {
+                var teacher = new Teacher
+                {
+                    FullName = dto.UserName,
+                    Email = dto.Email
+                };
+                try
+                {
+                    _context.Teachers.Add(teacher);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException)
+                {
+                    // αν δύο register έρθουν ταυτόχρονα με ίδιο username → UNIQUE index σκάει
+                    return Conflict("UserName already exists.");
+                }
+            }
             try
             {
                 _context.Users.Add(user);

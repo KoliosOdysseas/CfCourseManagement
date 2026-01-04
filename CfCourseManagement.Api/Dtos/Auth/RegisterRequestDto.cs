@@ -13,8 +13,7 @@
         public string? Email { get; set; }
         // Προαιρετικό email (δεν είναι υποχρεωτικό για login).
 
-        public string RoleName { get; set; } = "Student";
+        public string? RoleName { get; set; }
         // Το όνομα του ρόλου που θα πάρει ο χρήστης.
-        // Default = Student (ασφαλής επιλογή).
     }
 }
