@@ -1,6 +1,7 @@
 ﻿using CfCourseManagement.Api.Data;
 using CfCourseManagement.Api.Dtos.Teachers;
 using CfCourseManagement.Api.Models;
+using CourseManagementSystem.DTOs.Teachers;
 using Microsoft.EntityFrameworkCore;
 
 namespace CfCourseManagement.Api.Services
@@ -97,5 +98,54 @@ namespace CfCourseManagement.Api.Services
             }
         }
 
+        public async Task<TeacherInfoDto?> GetTeacherInfoAsync(int teacherId)
+        {
+            // 1) Φέρε τα βασικά στοιχεία του Teacher (ή null αν δεν υπάρχει)
+            var teacherBasic = await _context.Teachers
+                .AsNoTracking()
+                .Where(t => t.Id == teacherId)
+                .Select(t => new
+                {
+                    t.Id,
+                    t.FullName,
+                    t.Email,
+                    t.Phone
+                })
+                .FirstOrDefaultAsync();
+
+            if (teacherBasic is null)
+                return null;
+
+            // 2) Φέρε courses + students info με projection
+            var courses = await _context.Courses
+                .AsNoTracking()
+                .Where(c => c.TeacherId == teacherId)
+                .OrderBy(c => c.Title)
+                .Select(c => new TeacherCourseInfoDto
+                {
+                    CourseId = c.Id,
+                    Title = c.Title,
+
+                    StudentsCount = _context.Enrollments.Count(e => e.CourseId == c.Id),
+
+                    StudentFullNames = _context.Enrollments
+                        .Where(e => e.CourseId == c.Id)
+                        .Select(e => e.Student.FullName)
+                        .OrderBy(n => n)
+                        .ToList()
+                })
+                .ToListAsync();
+
+            return new TeacherInfoDto
+            {
+                TeacherId = teacherBasic.Id,
+                FullName = teacherBasic.FullName,
+                Email = teacherBasic.Email,
+                Phone = teacherBasic.Phone,
+                Courses = courses
+            };
+        }
     }
+
 }
+

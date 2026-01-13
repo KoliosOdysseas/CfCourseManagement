@@ -1,4 +1,5 @@
 ﻿using CfCourseManagement.Api.Dtos.Teachers;
+using CourseManagementSystem.DTOs.Teachers;
 
 namespace CfCourseManagement.Api.Services
 {
@@ -9,5 +10,7 @@ namespace CfCourseManagement.Api.Services
         Task<TeacherDto> CreateAsync(TeacherCreateDto dto);
         Task<bool> UpdateAsync(int id, TeacherUpdateDto dto);
         Task<bool> DeleteAsync(int id);
+
+        Task<TeacherInfoDto?> GetTeacherInfoAsync(int teacherId);
     }
 }
