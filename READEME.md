@@ -1,6 +1,9 @@
-# CfCourseManagementSystem
+# Course Management System – Coding Factory 8 Final Project
+
 
 A full-stack Course Management System built with ASP.NET Core Web API and Angular, designed to manage courses, teachers, students, and enrollments with authentication and role-based authorization.
+
+The application is based on a domain model consisting of Courses, Teachers, Students, Enrollments and Users, following a layered architecture approach.
 
 ---
 
@@ -12,16 +15,17 @@ A full-stack Course Management System built with ASP.NET Core Web API and Angula
 - SQL Server LocalDB
 - JWT Authentication
 - Role-based Authorization (Admin / Teacher / Student)
+- Different access levels are enforced both in the API and the frontend UI
 - CRUD operations for Courses, Teachers, Students
 - Course enrollments (many-to-many)
 - Proper HTTP status codes & error handling
-- Swagger API documentation
+- Swagger is used for API documentation and manual testing
 
 ### Frontend (Angular)
 - Standalone Angular application
 - Authentication (Login / Register)
 - JWT token handling
-- Protected routes (Guards)
+- Protected routes using Angular route guards
 - CRUD UI for Courses, Teachers, Students
 - Enrollment management UI
 - Clean academic-style UI
@@ -95,4 +99,4 @@ http://localhost:4200
 - Frontend complete
 - Authentication & Authorization implemented
 - Database migrations applied
-- Ready for GitHub & portfolio
+- Ready for final submission
