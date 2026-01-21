@@ -56,7 +56,7 @@ namespace CfCourseManagement.Api.Services
             }
             catch (DbUpdateException)
             {
-                // αν δύο enroll requests έρθουν ταυτόχρονα → composite PK (StudentId,CourseId) σκάει
+                //If we reach here, it means the enrollment could not be saved due to a DB constraint
                 throw new InvalidOperationException("Student is already enrolled in this course.");
             }
 
@@ -79,7 +79,7 @@ namespace CfCourseManagement.Api.Services
 
             _context.Enrollments.Remove(enrollment);
 
-            // (προαιρετικό αλλά επαγγελματικό) για να μην δεις ποτέ 500 από DB θέμα
+            //Optional: try/catch for DB constraints
             try
             {
                 await _context.SaveChangesAsync();
@@ -91,6 +91,7 @@ namespace CfCourseManagement.Api.Services
             }
         }
 
+        // Query Methods
         public async Task<List<StudentDto>> GetStudentsByCourseAsync(int courseId)
         {
             var courseExists = await _context.Courses
@@ -115,6 +116,7 @@ namespace CfCourseManagement.Api.Services
 
         }
 
+        
         public async Task<List<CourseDto>> GetCoursesByStudentAsync(int studentId)
         {
             var studentExists = await _context.Students

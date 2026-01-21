@@ -17,7 +17,7 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // POST: api/enrollment
-        // Admin ή Student μπορεί να εγγραφεί σε μάθημα
+        // Admin or Student can enroll
         [Authorize(Roles = "Admin,Student")]
         [HttpPost]
         public async Task<IActionResult> Enroll([FromBody] EnrollmentCreateDto dto)
@@ -42,8 +42,8 @@ namespace CfCourseManagement.Api.Controllers
             }
         }
 
-        // DELETE: api/enrollment?studentId=1&courseId=2
-        // Admin ή Student μπορεί να κάνει unenroll
+        //delete: api/enrollment?studentId=5&courseId=2
+        // Admin or Student can unenroll
         [Authorize(Roles = "Admin,Student")]
         [HttpDelete]
         public async Task<IActionResult> Unenroll(
@@ -60,7 +60,7 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // GET: api/enrollment/course/2/students
-        // Admin ή Teacher βλέπουν students ενός course
+        // Admin or Teacher can see students of a course
         [Authorize(Roles = "Admin,Teacher")]
         [HttpGet("course/{courseId}/students")]
         public async Task<IActionResult> GetStudentsByCourse(int courseId)
@@ -77,7 +77,7 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // GET: api/enrollment/student/5/courses
-        // Admin, Teacher ή Student βλέπουν courses ενός student
+        // Admin, Teacher or Student can see courses of a student
         [Authorize(Roles = "Admin,Teacher,Student")]
         [HttpGet("student/{studentId}/courses")]
         public async Task<IActionResult> GetCoursesByStudent(int studentId)

@@ -2,19 +2,17 @@
 {
     public class AuthResponseDto
     {
+        //DTO whose purpose is to return the JWT token and related info to the client after successful authentication.
         public string Token { get; set; } = string.Empty;
-        // Το JWT token που θα χρησιμοποιεί ο client σε κάθε επόμενο request.
-        // Θα μπαίνει στο header: Authorization: Bearer <Token>
 
+        // The expiration time of the token in UTC.
         public DateTime ExpiresAtUtc { get; set; }
-        // Πότε λήγει το token (UTC).
-        // Ο client μπορεί να ξέρει πότε να κάνει re-login ή refresh.
 
+        // The username of the authenticated user.
         public string UserName { get; set; } = string.Empty;
-        // Ποιος χρήστης είναι logged in (χρήσιμο για UI).
 
+        // The role of the authenticated user.
         public string Role { get; set; } = string.Empty;
-        // Ο ρόλος του χρήστη (Admin / Teacher / Student).
-        // για authorization στο frontend.
+       
     }
 }

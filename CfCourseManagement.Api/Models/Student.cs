@@ -18,7 +18,7 @@ namespace CfCourseManagement.Api.Models
         [Required]
         public string? Email { get; set; }
 
-        // Navigation property για τις εγγραφές
+        
         public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
 
     }

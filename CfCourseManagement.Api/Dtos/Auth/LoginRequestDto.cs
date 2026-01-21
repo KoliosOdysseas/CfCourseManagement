@@ -2,10 +2,11 @@
 {
     public class LoginRequestDto 
     {
+        // DTO whose purpose is to receive the username and password from the client during login.
         public string UserName { get; set; } = string.Empty;
-        // Το username που πληκτρολογεί ο χρήστης (default empty για να μην είναι null).
 
+        // The password of the user trying to log in.
         public string Password { get; set; } = string.Empty;
-        // Το password που πληκτρολογεί ο χρήστης (θα το συγκρίνουμε με PasswordHash στη βάση).
+        
     }
 }

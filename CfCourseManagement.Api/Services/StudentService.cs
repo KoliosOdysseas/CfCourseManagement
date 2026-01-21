@@ -67,6 +67,7 @@ namespace CfCourseManagement.Api.Services
             };
         }
 
+        
         public async Task<bool> UpdateAsync(int id, StudentUpdateDto dto)
         {
             var student = await _context.Students.FirstOrDefaultAsync(s => s.Id == id);

@@ -1,6 +1,6 @@
 ﻿namespace CfCourseManagement.Api.Dtos.Courses
 {
-    // Τι στέλνει ο client όταν κάνει POST /api/course
+    // DTO for creating a new course
     public class CourseCreateDto
     {
         public string Title { get; set; } = string.Empty;

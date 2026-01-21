@@ -17,7 +17,7 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // GET: api/student
-        // Admin ή Teacher μπορούν να δουν τους students
+        // Admin or Teacher can view all students
         [Authorize(Roles = "Admin,Teacher")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -27,7 +27,7 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // GET: api/student/{id}
-        // Admin ή Teacher μπορούν να δουν student
+        // Admin or Teacher can view student by ID
         [Authorize(Roles = "Admin,Teacher")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
@@ -42,7 +42,7 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // POST: api/student
-        // ΜΟΝΟ Admin μπορεί να δημιουργεί students
+        // ONLY Admin can create students
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] StudentCreateDto dto)
@@ -60,7 +60,7 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // PUT: api/student/{id}
-        // ΜΟΝΟ Admin μπορεί να κάνει update students
+        // ONLY Admin can update students
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] StudentUpdateDto dto)
@@ -80,7 +80,7 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // DELETE: api/student/{id}
-        // ΜΟΝΟ Admin μπορεί να διαγράφει students
+        // ONLY Admin can delete students
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

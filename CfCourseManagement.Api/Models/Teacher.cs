@@ -2,12 +2,12 @@
 {
     public class Teacher
     {
-        public int Id { get; set; }           // Primary Key (Identity)
-        public string FullName { get; set; }  // Πλήρες όνομα καθηγητή
-        public string? Email { get; set; }    // Προαιρετικό email
-        public string? Phone { get; set; }    // Προαιρετικό τηλέφωνο
+        public int Id { get; set; }          
+        public string FullName { get; set; }  
+        public string? Email { get; set; }    
+        public string? Phone { get; set; }    
 
-        // Navigation property: Ένας Teacher έχει πολλά Courses
+        
         public List<Course> Courses { get; set; } = new();
     }
 }

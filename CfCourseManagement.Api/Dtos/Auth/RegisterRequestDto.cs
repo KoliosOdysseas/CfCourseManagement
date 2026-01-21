@@ -2,18 +2,17 @@
 {
     public class RegisterRequestDto
     {
+        // DTO whose purpose is to receive user registration data from the client.
         public string UserName { get; set; } = string.Empty;
-        // Το username που θα έχει ο χρήστης στο σύστημα.
-        // Θα είναι UNIQUE 
 
+        // The password for the new user account.
         public string Password { get; set; } = string.Empty;
-        // Το password σε plain text από το request.
-        // θα γίνει hash πριν σωθεί στη βάση.
 
+        // The email address of the new user.
         public string? Email { get; set; }
-        // Προαιρετικό email (δεν είναι υποχρεωτικό για login).
 
+        // The role to be assigned to the new user (optional).
         public string? RoleName { get; set; }
-        // Το όνομα του ρόλου που θα πάρει ο χρήστης.
+        
     }
 }

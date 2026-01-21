@@ -91,7 +91,7 @@ namespace CfCourseManagement.Api.Services
             }
             catch (DbUpdateException)
             {
-                // Υπάρχουν Courses που έχουν TeacherId
+                
                 throw new InvalidOperationException(
                     "Cannot delete teacher because there are courses assigned to them."
                 );
@@ -100,7 +100,7 @@ namespace CfCourseManagement.Api.Services
 
         public async Task<TeacherInfoDto?> GetTeacherInfoAsync(int teacherId)
         {
-            // 1) Φέρε τα βασικά στοιχεία του Teacher (ή null αν δεν υπάρχει)
+            
             var teacherBasic = await _context.Teachers
                 .AsNoTracking()
                 .Where(t => t.Id == teacherId)
@@ -116,7 +116,7 @@ namespace CfCourseManagement.Api.Services
             if (teacherBasic is null)
                 return null;
 
-            // 2) Φέρε courses + students info με projection
+            
             var courses = await _context.Courses
                 .AsNoTracking()
                 .Where(c => c.TeacherId == teacherId)

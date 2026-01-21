@@ -136,7 +136,7 @@ namespace CfCourseManagement.Api.Services
             }
             catch (DbUpdateException)
             {
-                // Υπάρχουν Enrollments για το course
+                // Assuming the exception is due to foreign key constraints (e.g., students enrolled in the course)
                 throw new InvalidOperationException(
                     "Cannot delete course because there are students enrolled in it."
                 );

@@ -30,7 +30,7 @@ namespace CfCourseManagement.Api.Controllers
             if (string.IsNullOrWhiteSpace(dto.UserName) || string.IsNullOrWhiteSpace(dto.Password))
                 return BadRequest("UserName and Password are required.");
 
-            // (προ-έλεγχος) αν υπάρχει ήδη username
+            // check if username is taken
             var usernameTaken = await _context.Users
                 .AsNoTracking()
                 .AnyAsync(u => u.UserName == dto.UserName);
@@ -38,7 +38,7 @@ namespace CfCourseManagement.Api.Controllers
             if (usernameTaken)
                 return Conflict("UserName is already taken.");
 
-            // βρίσκουμε role από το RoleName
+            // check if role exists
             var role = await _context.Roles
                 .FirstOrDefaultAsync(r => r.Name == dto.RoleName);
 
@@ -48,7 +48,7 @@ namespace CfCourseManagement.Api.Controllers
             // hash password
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
-            // φτιάχνουμε user
+            // create user
             var user = new User
             {
                 UserName = dto.UserName,
@@ -58,7 +58,7 @@ namespace CfCourseManagement.Api.Controllers
                 RoleId = role.Id
             };
 
-            // SAVE με try/catch (UNIQUE constraint / race condition)
+            // SAVE with try/catch (UNIQUE constraint / race condition)
             if (dto.RoleName == "Student")
             {
                 var student = new Student
@@ -73,7 +73,7 @@ namespace CfCourseManagement.Api.Controllers
                 }
                 catch (DbUpdateException)
                 {
-                    // αν δύο register έρθουν ταυτόχρονα με ίδιο username → UNIQUE index σκάει
+                    
                     return Conflict("UserName already exists.");
                 }
             }
@@ -91,7 +91,7 @@ namespace CfCourseManagement.Api.Controllers
                 }
                 catch (DbUpdateException)
                 {
-                    // αν δύο register έρθουν ταυτόχρονα με ίδιο username → UNIQUE index σκάει
+                    // if two registers come simultaneously with the same username → UNIQUE index fails
                     return Conflict("UserName already exists.");
                 }
             }
@@ -102,16 +102,16 @@ namespace CfCourseManagement.Api.Controllers
             }
             catch (DbUpdateException)
             {
-                // αν δύο register έρθουν ταυτόχρονα με ίδιο username → UNIQUE index σκάει
+                
                 return Conflict("UserName already exists.");
             }
 
-            // reload user με Role (για να υπάρχει user.Role.Name όταν φτιάχνουμε token)
+            // fetch created user with role
             var createdUser = await _context.Users
                 .Include(u => u.Role)
                 .FirstAsync(u => u.Id == user.Id);
 
-            // κόβουμε token
+            // create token
             var (token, expiresAtUtc) = _jwtTokenService.CreateToken(createdUser);
 
             // response

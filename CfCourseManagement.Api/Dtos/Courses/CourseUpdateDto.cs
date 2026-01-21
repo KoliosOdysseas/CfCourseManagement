@@ -1,6 +1,7 @@
 ﻿namespace CfCourseManagement.Api.Dtos.Courses
 {
-    // Τι στέλνει ο client όταν κάνει PUT /api/course/{id}
+
+    //What properties are needed to update a course
     public class CourseUpdateDto
     {
         public string Title { get; set; } = string.Empty;

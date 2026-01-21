@@ -40,7 +40,7 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // POST: api/course
-        // ΜΟΝΟ Admin ή Teacher
+        // Only Admin or Teacher
         [Authorize(Roles = "Admin,Teacher")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CourseCreateDto dto)
@@ -65,7 +65,7 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // PUT: api/course/{id}
-        // ΜΟΝΟ Admin ή Teacher
+        // Only Admin or Teacher
         [Authorize(Roles = "Admin,Teacher")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] CourseUpdateDto dto)
@@ -92,7 +92,7 @@ namespace CfCourseManagement.Api.Controllers
         }
 
         // DELETE: api/course/{id}
-        // ΜΟΝΟ Admin ή Teacher
+        // Only Admin or Teacher
         [Authorize(Roles = "Admin,Teacher")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

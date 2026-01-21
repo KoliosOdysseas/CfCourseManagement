@@ -1,5 +1,6 @@
 ﻿namespace CfCourseManagement.Api.Dtos.Courses
 {
+    // DTO for transferring course data
     public class CourseDto
     {
         public int Id { get; set; }                      // ID του course
@@ -9,7 +10,7 @@
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        // Μόνο το TeacherId, όχι ολόκληρο το Teacher object
+        //Only for relational mapping
         public int? TeacherId { get; set; }
     }
 }
